@@ -19,14 +19,15 @@
     "default_title": "page action demo",
     "default_popup": "src/page_action/page_action.html"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.ebay.com/*"
-      ],
-      "js": [
-        "src/inject/inject.js"
-      ]
-    }
-  ]
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [{
+    "matches": [
+      "https://*/*"
+    ],
+    "js": [
+      "src/inject/inject.js"
+    ]
+  }]
 }
