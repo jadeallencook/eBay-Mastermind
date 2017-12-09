@@ -1,0 +1,55 @@
+<!doctype html>
+<style type="text/css">
+	#mainPopup {
+		padding: 10px;
+		height: 200px;
+		width: 400px;
+		font-family: Helvetica, Ubuntu, Arial, sans-serif;
+	}
+
+	h1 {
+		font-size: 2em;
+	}
+</style>
+
+<div id="mainPopup">
+	<!-- title -->
+	<h1>eBay Mastermind</h1>
+	<!-- step 1 (default) -->
+	<div id="step-1" style="display: none">
+		<select id="make">
+			<option selected="true" disabled="disabled">Select Make</option>
+			<option value="">Apple</option>
+		</select>
+		<span>or</span>
+		<input type="text" placeholder="Enter Model Number">
+		<br />
+		<br />
+		<button>Get Appraisal</button>
+		<button>Other Options</button>
+	</div>
+	<!-- step 2 -->
+	<div id="step-2">
+		<select id="model">
+			<option selected="true" disabled="disabled">Select Make</option>
+			<option value="">4</option>
+		</select>
+		<input type="number" placeholder="Enter GBs" />
+		<br />
+		<h3>Other Options</h3>
+		<input id="water-damage" type="checkbox" value="water-damage"> Water Damage
+		<br />
+		<input id="bad-esn" type="checkbox" value="bad-esn"> Bad ESN
+		<br />
+		<input id="broken-screen" type="checkbox" value="broken-screen"> Broken Screen
+	</div>
+	<!-- footer -->
+	<br />
+	<small>Powered by
+		<a href="http://onflo.io/" target="_blank">Onflo</a> 
+		- Helping businesses with thier online workflow.
+	</small>
+	<br />
+	<br />
+	<script src="app.js"></script>
+</div>
