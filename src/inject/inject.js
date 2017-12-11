@@ -1,18 +1,22 @@
 // setup chrome extension
-chrome.extension.sendMessage({}, function (response) {
-	var readyStateCheckInterval = setInterval(function () {
+chrome.extension.sendMessage({}, (response) => {
+	let loaded = false,
+		loadedCount = 0;
+	var readyStateCheckInterval = setInterval(() => {
 		if (document.readyState === "complete") {
-			clearInterval(readyStateCheckInterval);
+			if (loadedCount === 6) clearInterval(readyStateCheckInterval);
+			// insert mastermind ui into ebay layout
+			const container = document.querySelector('#LeftPanel');
+			if (!loaded) container.innerHTML = '<h3 style="margin: 0px;">Average Price</h3><span id="mastermind-price">Loading...</span><br /><br />' + container.innerHTML;
+			// for debugging purposes
+			const debug = true;
 			// make sure url is running plugin
 			if (window.location.hash === '#mastermind') {
-				// insert mastermind ui into ebay layout
-				const container = document.querySelector('#e1-12 > div.rlp-h');
-				container.innerHTML = '<h3>Average Price</h3><br /><span id="mastermind-price">Loading...</span><br /><br />' + container.innerHTML;
 				// cache chrome storage
 				const storage = chrome.storage.local;
 				// get chrome storage data
 				storage.get((data) => {
-					console.log('Mastermind: Getting average price for "' + data.search.join(' ') + '"')
+					if (debug) console.log('Mastermind: Getting average price for "' + data.search.join(' ') + '"');
 					// cache all result elements
 					const results = document.getElementsByClassName('sresult');
 					// go over each result to get average
@@ -31,7 +35,7 @@ chrome.extension.sendMessage({}, function (response) {
 						}
 						if (!condition || condition === 'brand new' || condition === 'parts only') {
 							if (!condition) condition = 'no condition was found on listing'
-							console.error('REMOVED (Not in the right condition): ' + condition);
+							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 							test = false;
 						}
 						// tests each word in title
@@ -39,35 +43,45 @@ chrome.extension.sendMessage({}, function (response) {
 							word = word.toLowerCase();
 							if (title.indexOf(word) === -1) {
 								test = false;
-								console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
+								if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
 							}
 						}
 						// spam filters
 						if (price < 5) {
 							test = false;
-							console.error('REMOVED (Price was way too low, we needed to cut it): $' + price);
+							if (dedug) console.error('REMOVED (Price was way too low, we needed to cut it): $' + price);
 						}
 						// add to average array
 						if (test) {
-							console.log('ADDED (Everything checked out): ' + title + ' selling for $' + price + ' with a condition of ' + condition);
+							if (debug) console.log('ADDED (Everything checked out): ' + title + ' selling for $' + price + ' with a condition of ' + condition);
 							average.push(price);
 						} else {
 							result.remove();
 						}
 					}
+					console.log(average);
 					// calculate average from array
 					let avgCount = 0,
-					avgSum = 0;
+						avgSum = 0;
 					for (let num of average) {
 						avgCount++;
 						avgSum += num;
 					}
 					average = Math.floor(avgSum / avgCount);
 					// output information
-					document.getElementById('mastermind-price').innerText = '$' + average + ' out of ' + avgCount + ' device(s)';
-					console.log('Mastermind: Average price device is $' + average + ' out of ' + avgCount + ' device(s)');
+					var html = '';
+					if (avgCount !== 0) {
+						if (loadedCount < 6) html = '$' + average + ' out of ' + avgCount + ' device(s)';
+						else html = '<span style="color: green;"><b>$' + average + '</b></span> out of <b>' + avgCount + '</b> device(s)';
+					} else {
+						html = 'Could not find any devices'
+					}
+					document.getElementById('mastermind-price').innerHTML = html;
+					if (debug) console.log('Mastermind: ' + html);
+					loaded = true;
+					loadedCount++;
 				});
 			}
 		}
-	}, 10);
+	}, 1000);
 });
