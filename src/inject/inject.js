@@ -1,13 +1,12 @@
 // setup chrome extension
 chrome.extension.sendMessage({}, (response) => {
-	let loaded = false,
-		loadedCount = 0;
+	let loaded = 0;
 	var readyStateCheckInterval = setInterval(() => {
 		if (document.readyState === "complete") {
-			if (loadedCount === 6) clearInterval(readyStateCheckInterval);
+			if (loaded === 6) clearInterval(readyStateCheckInterval);
 			// insert mastermind ui into ebay layout
 			const container = document.querySelector('#LeftPanel');
-			if (!loaded) container.innerHTML = '<h3 style="margin: 0px;">Average Price</h3><span id="mastermind-price">Loading...</span><br /><br />' + container.innerHTML;
+			if (loaded == 0) container.innerHTML = '<h3 style="margin: 0px;">Average Price</h3><span id="mastermind-price">Loading...</span><br /><br />' + container.innerHTML;
 			// for debugging purposes
 			const debug = true;
 			// make sure url is running plugin
@@ -71,15 +70,14 @@ chrome.extension.sendMessage({}, (response) => {
 					// output information
 					var html = '';
 					if (avgCount !== 0) {
-						if (loadedCount < 6) html = '$' + average + ' out of ' + avgCount + ' device(s)';
+						if (loaded < 6) html = '$' + average + ' out of ' + avgCount + ' device(s)';
 						else html = '<span style="color: green;"><b>$' + average + '</b></span> out of <b>' + avgCount + '</b> device(s)';
 					} else {
 						html = 'Could not find any devices'
 					}
 					document.getElementById('mastermind-price').innerHTML = html;
 					if (debug) console.log('Mastermind: ' + html);
-					loaded = true;
-					loadedCount++;
+					loaded++;
 				});
 			}
 		}
