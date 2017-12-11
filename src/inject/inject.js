@@ -48,7 +48,7 @@ chrome.extension.sendMessage({}, (response) => {
 						// spam filters
 						if (price < 5) {
 							test = false;
-							if (dedug) console.error('REMOVED (Price was way too low, we needed to cut it): $' + price);
+							if (debug) console.error('REMOVED (Price was way too low, we needed to cut it): $' + price);
 						}
 						// add to average array
 						if (test) {
