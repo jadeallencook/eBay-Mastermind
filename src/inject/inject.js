@@ -32,7 +32,7 @@ chrome.extension.sendMessage({}, (response) => {
 							condition = result.getElementsByClassName('lvsubtitle');
 							condition = condition[condition.length - 1].innerText.toLowerCase();
 						}
-						if (!condition || condition === 'brand new' || condition === 'parts only') {
+						if (!condition || condition === 'brand new') {
 							if (!condition) condition = 'no condition was found on listing'
 							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 							test = false;
@@ -46,7 +46,7 @@ chrome.extension.sendMessage({}, (response) => {
 							}
 						}
 						// spam filters
-						if (price < 5) {
+						if (price < 15) {
 							test = false;
 							if (debug) console.error('REMOVED (Price was way too low, we needed to cut it): $' + price);
 						}
@@ -58,7 +58,6 @@ chrome.extension.sendMessage({}, (response) => {
 							result.remove();
 						}
 					}
-					console.log(average);
 					// calculate average from array
 					let avgCount = 0,
 						avgSum = 0;
