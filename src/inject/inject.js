@@ -54,7 +54,6 @@ chrome.extension.sendMessage({}, (response) => {
 							condition = condition[condition.length - 1].innerText.toLowerCase();
 						}
 						if (!condition || condition === 'brand new') {
-							if (!condition) condition = 'no condition was found on listing'
 							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 							test = false;
 						}
