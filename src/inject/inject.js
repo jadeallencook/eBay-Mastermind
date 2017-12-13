@@ -45,6 +45,17 @@ chrome.extension.sendMessage({}, (response) => {
 								if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
 							}
 						}
+						// test for mulitple gigs
+						let gbsInTitle = 0;
+						for (let gb of ['16', '32', '64', '128', '256']) {
+							if (title.indexOf(gb) !== -1) {
+								gbsInTitle++;
+							}
+							if (gbsInTitle > 1) {
+								test = false;
+								if (debug) console.error('REMOVED (Title contain multiple gigs): ' + title);
+							}
+						}
 						// spam filters
 						if (price < 15) {
 							test = false;
