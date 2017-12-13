@@ -1,8 +1,9 @@
 // setup chrome extension
 chrome.extension.sendMessage({}, (response) => {
-	let loaded = 0;
+	let loaded = 0,
+		broken = false;
 	var readyStateCheckInterval = setInterval(() => {
-		if (document.readyState === "complete") {
+		if (document.readyState === 'complete') {
 			if (loaded === 6) clearInterval(readyStateCheckInterval);
 			// insert mastermind ui into ebay layout
 			const container = document.querySelector('#LeftPanel');
@@ -26,6 +27,26 @@ chrome.extension.sendMessage({}, (response) => {
 						// get data from elements
 						const title = result.getElementsByClassName('lvtitle')[0].innerText.toLowerCase();
 						const price = parseFloat(result.getElementsByClassName('lvprice')[0].innerText.replace('$', ''));
+						// tests each word in title
+						for (let word of data.search) {
+							if (word === 'broken' || word === 'cracked') broken = true;
+							word = word.toLowerCase();
+							if (title.indexOf(word) === -1) {
+								test = false;
+								if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
+							}
+						}
+						// test for multiple gigs
+						let gbsInTitle = 0;
+						for (let gb of ['16', '32', '64', '128', '256']) {
+							if (title.indexOf(gb) !== -1) {
+								gbsInTitle++;
+							}
+							if (gbsInTitle > 1) {
+								test = false;
+								if (debug) console.error('REMOVED (Title contain multiple gigs): ' + title);
+							}
+						}
 						// check condition
 						let condition = false;
 						if (result.getElementsByClassName('lvsubtitle')[0]) {
@@ -37,24 +58,9 @@ chrome.extension.sendMessage({}, (response) => {
 							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 							test = false;
 						}
-						// tests each word in title
-						for (let word of data.search) {
-							word = word.toLowerCase();
-							if (title.indexOf(word) === -1) {
-								test = false;
-								if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
-							}
-						}
-						// test for mulitple gigs
-						let gbsInTitle = 0;
-						for (let gb of ['16', '32', '64', '128', '256']) {
-							if (title.indexOf(gb) !== -1) {
-								gbsInTitle++;
-							}
-							if (gbsInTitle > 1) {
-								test = false;
-								if (debug) console.error('REMOVED (Title contain multiple gigs): ' + title);
-							}
+						if (condition && !broken && condition === 'parts only') {
+							test = false;
+							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 						}
 						// spam filters
 						if (price < 15) {
