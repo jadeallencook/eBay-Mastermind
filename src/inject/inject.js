@@ -1,7 +1,8 @@
 // setup chrome extension
 chrome.extension.sendMessage({}, (response) => {
 	let loaded = 0,
-		broken = false;
+		broken = false,
+		badESN = [];
 	var readyStateCheckInterval = setInterval(() => {
 		if (document.readyState === 'complete') {
 			if (loaded === 6) clearInterval(readyStateCheckInterval);
@@ -27,14 +28,28 @@ chrome.extension.sendMessage({}, (response) => {
 						// get data from elements
 						const title = result.getElementsByClassName('lvtitle')[0].innerText.toLowerCase();
 						const price = parseFloat(result.getElementsByClassName('lvprice')[0].innerText.replace('$', ''));
+						// reset bad esn param 
+						badESN = [];
 						// tests each word in title
 						for (let word of data.search) {
 							if (word === 'broken' || word === 'cracked') broken = true;
 							word = word.toLowerCase();
 							if (title.indexOf(word) === -1) {
-								test = false;
-								if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
+								if (word === 'att' && title.indexOf('at&t') !== -1) {
+									test = true;
+								} else if (word === 'tmobile' && title.indexOf('t-mobile') !== -1) {
+									test = true;
+								} else {
+									test = false;
+									if (debug) console.error('REMOVED (Listing title didn\'t contain "' + word + '"): ' + title);
+								}
+							} else if (word === 'cracked') {
+								if (title.indexOf('bad lcd') !== -1 || title.indexOf('broken display') !== -1) {
+									test = false;
+									if (debug) console.error('REMOVED (Cracked or broke LCD): ' + title);
+								}
 							}
+							if (word === 'bad' || word === 'esn') badESN.push(word);
 						}
 						// test for multiple gigs
 						let gbsInTitle = 0;
@@ -57,7 +72,7 @@ chrome.extension.sendMessage({}, (response) => {
 							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 							test = false;
 						}
-						if (condition && !broken && condition === 'parts only') {
+						if (condition && !broken && condition === 'parts only' && badESN.length !== 2) {
 							test = false;
 							if (debug) console.error('REMOVED (Not in the right condition): ' + condition);
 						}
